@@ -108,7 +108,7 @@ The minimal gap between validation and test accuracy indicates stable generaliza
 
 ![Confusion Matrix](reports/confusion_matrix.png)
 
-The normalized confusion matrix provides a detailed view of class-level performance. The model shows its strongest performance in identifying neutral market conditions, which dominate in low-volatility regimes. Misclassifications primarily occur between upward and downward movements near the labeling threshold, reflecting the intrinsic ambiguity of marginal price changes.
+The normalized confusion matrix highlights strong class-level performance for directional movements, with the highest precision observed for downward and upward trends. Neutral market conditions, while still reasonably well classified, remain more challenging due to their proximity to the labeling threshold in low-volatility regimes. Most misclassifications occur between upward and downward classes near this threshold, reflecting the inherent ambiguity of marginal price fluctuations.
 
 ---
 
