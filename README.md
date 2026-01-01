@@ -1,9 +1,19 @@
-# Market Trend Analysis: Predictive Modeling and Quantitative EDA
+# Market Trend Analysis  
+Predictive Modeling and Quantitative Exploratory Data Analysis
 
 ## Project Overview
-This project focuses on the comprehensive analysis of historical market data, aiming to identify patterns in asset price movements and develop a predictive model for daily returns. The study covers the entire pipeline from data integrity validation and Exploratory Data Analysis (EDA) to the implementation of machine learning classification models.
 
-The core objective was to determine whether technical indicators could provide a statistically significant edge in predicting market direction within a low-volatility environment.
+This project presents an end-to-end quantitative analysis of historical market data with the objective of identifying statistically meaningful patterns in daily asset price movements and evaluating whether technical indicators can provide a predictive edge in a low-volatility market regime.
+
+The workflow covers the complete data science lifecycle: data validation, exploratory data analysis (EDA), feature engineering, supervised machine learning, and decision-oriented evaluation of model outputs.
+
+The core modeling task is formulated as a three-class classification problem:
+
+- **Up** – meaningful positive daily return  
+- **Down** – meaningful negative daily return  
+- **Neutral** – price movement within a predefined noise threshold  
+
+---
 
 ## Data Source
 The dataset used in this analysis was sourced from Kaggle.
@@ -16,40 +26,132 @@ The dataset used in this analysis was sourced from Kaggle.
 
 **License:** CC BY 4.0 - [Link to License](https://creativecommons.org/licenses/by/4.0/)
 
-## Key Methodology
-### 1. Data Integrity and Cleaning
-Financial datasets often suffer from "look-ahead bias" and survivorship bias. To ensure a robust foundation, the following steps were taken:
-- **Handling Missing Values:** Implemented Forward Fill (ffill) to maintain time-series continuity without introducing future information.
-- **Logical Validation:** Applied constraints to ensure daily high/low/close price consistency (e.g., ensuring High >= Low).
-- **Feature Engineering:** Developed technical indicators including RSI (Relative Strength Index), MACD (Moving Average Convergence Divergence), and 50-day Simple Moving Averages (SMA).
+The dataset consists of historical OHLC price data enriched with derived technical indicators.
 
-### 2. Quantitative Exploratory Data Analysis (EDA)
-The EDA phase focused on the statistical properties of market returns:
-- **Distribution Analysis:** Identified high kurtosis (leptokurtic distribution) with narrow tails, suggesting a highly stable market regime with rare extreme events.
-- **Multicollinearity Check:** Discovered a high correlation (0.86) between RSI and MACD, leading to strategic feature selection to avoid model redundancy.
+---
 
-### 3. Machine Learning Framework
-A 3-class classification approach was adopted to distinguish between meaningful trends and market noise:
-- Target Labeling: Movements were classified as Up (1), Down (-1), or Neutral (0) using a 0.5% volatility threshold.
-- Splitting Strategy: Utilized a chronological Time-Series Split (70% Train / 15% Val / 15% Test) to respect the temporal nature of the data.
-- Model Benchmarking: Evaluated Random Forest, XGBoost, and Logistic Regression.
+## Methodology
 
-## Results and Findings
-**Predictive Performance:** The optimized Random Forest model achieved a Final Test Accuracy of 0.41. Given a 3-class random baseline of 0.33, this represents an ~8% predictive edge.
+### 1. Data Integrity and Preprocessing
 
-**Generalization:** The minimal variance between Validation (0.42) and Test (0.41) accuracy scores confirms the model's stability and resistance to overfitting.
+Financial time-series data is particularly susceptible to look-ahead bias, data leakage, and logical inconsistencies. To ensure a robust analytical foundation, the following steps were applied:
 
-**Feature Importance:** Analysis revealed that while price action (Close/SMA) remains the primary driver, momentum indicators (RSI/MACD) provide critical secondary signals for trend identification.
+- Forward-filling missing values to preserve temporal continuity without introducing future information  
+- Logical validation of OHLC prices (e.g. enforcing `High ≥ Low`)  
+- Strict chronological sorting of observations  
+- Time-aware data splitting to respect temporal dependencies  
+- Feature engineering of commonly used technical indicators:
+  - Relative Strength Index (RSI)
+  - Moving Average Convergence Divergence (MACD)
+  - Simple Moving Average (SMA)
+
+---
+
+### 2. Quantitative Exploratory Data Analysis
+
+The EDA phase focused on understanding the statistical properties of daily returns and relationships between engineered features.
+
+#### Distribution of Daily Returns
+
+![Returns Distribution](reports/returns_distribution.png)
+
+The distribution of daily percentage returns exhibits a leptokurtic shape with strong concentration around zero, which is characteristic of low-volatility market regimes. This observation motivated the use of a three-class labeling strategy to explicitly separate noise from actionable price movements.
+
+---
+
+### 3. Feature Relationships and Selection
+
+Correlation analysis revealed strong multicollinearity between several momentum-based indicators. These findings guided feature selection decisions to reduce redundancy and improve model stability.
+
+#### Feature Importance (Random Forest)
+
+![Feature Importance](reports/feature_importance.png)
+
+Price-level features dominate predictive power, while momentum indicators such as RSI and MACD provide complementary secondary signals. No single indicator is sufficient on its own, reinforcing the necessity of multivariate modeling.
+
+---
+
+### 4. Machine Learning Framework
+
+**Problem Type**: Multiclass classification (Up / Neutral / Down)  
+
+**Target Labeling**: Daily returns were discretized using a ±0.5% threshold to distinguish meaningful price movements from market noise.
+
+**Data Split**:
+  - 70% training  
+  - 15% validation  
+  - 15% test  
+  (chronological, time-series aware split)
+
+**Models Evaluated**:
+  - Logistic Regression  
+  - Random Forest  
+  - XGBoost  
+
+The Random Forest model demonstrated the most favorable bias–variance trade-off and was selected as the final model.
+
+---
+
+## Results
+
+- **Final Test Accuracy**: approximately 0.41  
+- **Three-Class Random Baseline**: approximately 0.33  
+- **Predictive Edge**: ~8 percentage points above random guessing  
+
+The minimal gap between validation and test accuracy indicates stable generalization. Results are interpreted conservatively, acknowledging the inherent difficulty of financial prediction in low-volatility environments.
+
+---
+
+## Model Evaluation
+
+### Confusion Matrix
+
+![Confusion Matrix](reports/confusion_matrix.png)
+
+The normalized confusion matrix provides a detailed view of class-level performance. The model shows its strongest performance in identifying neutral market conditions, which dominate in low-volatility regimes. Misclassifications primarily occur between upward and downward movements near the labeling threshold, reflecting the intrinsic ambiguity of marginal price changes.
+
+---
+
+### Active Strategy Daily Returns
+
+![Active Strategy Returns](reports/strategy_active_days.png)
+
+This visualization presents daily returns for periods in which the model generated an active trading signal (long or short). It highlights when the model chose to engage with the market and the corresponding distribution of gains and losses on those days.
+
+---
 
 ## Tools and Technologies
-**Language:** Python (Pandas, NumPy)
 
-**Environment:** Google Colab
+- **Programming Language**: Python  
+- **Data Analysis**: Pandas, NumPy  
+- **Machine Learning**: Scikit-learn, XGBoost  
+- **Visualization**: Matplotlib, Seaborn, Plotly  
+- **Environment**: Google Colab  
 
-**Machine Learning:** Scikit-Learn, XGBoost
+---
 
-**Visualization:** Matplotlib, Seaborn, Plotly
+## Key Takeaways
 
+- Even in highly stable, low-volatility markets, technical indicators can provide a measurable predictive signal  
+- Accuracy alone is insufficient for evaluating financial models; class-level analysis is critical in imbalanced, noise-dominated datasets  
+- Conservative models that trade infrequently can still extract value by avoiding market noise  
+- Proper handling of time-series data is essential to avoid misleading conclusions
 
-## Conclusions
-The analysis proves that even in a highly concentrated, low-volatility market, quantitative indicators can provide a reliable signal for directional movement. The project demonstrates the full lifecycle of a data science task, emphasizing the importance of domain-specific data preparation and the cautious interpretation of statistical models in finance.
+---
+
+## Repository Structure
+```
+data/
+├── raw_data.csv
+└── cleaned_data.csv
+
+notebooks/
+├── 01_Data_Cleaning_and_EDA.ipynb
+└── 02_Modeling_and_Prediction.ipynb
+
+reports/
+├── feature_importance.png
+├── returns_distribution.png
+├── confusion_matrix.png
+└── strategy_active_days.png
+```
